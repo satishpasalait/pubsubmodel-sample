@@ -7,5 +7,9 @@
     <Project Path="Fanout/PubSub.Sample.Fanout.Publisher/PubSub.Sample.Fanout.Publisher.csproj" />
     <Project Path="Fanout/PubSub.Sample.Fanout.Consumer/PubSub.Sample.Fanout.Consumer.csproj" />
   </Folder>
+  <Folder Name="/Topic/">
+    <Project Path="Topic/PubSub.Sample.Topic.Publisher/PubSub.Sample.Topic.Publisher.csproj" />
+    <Project Path="Topic/PubSub.Sample.Topic.Consumer/PubSub.Sample.Topic.Consumer.csproj" />
+  </Folder>
   <Project Path="PubSub.Sample.Common/PubSub.Sample.Common.csproj" />
 </Solution>
