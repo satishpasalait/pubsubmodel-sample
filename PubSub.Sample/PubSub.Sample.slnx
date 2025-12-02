@@ -3,5 +3,9 @@
     <Project Path="Basic/PubSub.Sample.Basic.Producer/PubSub.Sample.Basic.Producer.csproj" />
     <Project Path="Basic/PubSub.Sample.Basic.Consumer/PubSub.Sample.Basic.Consumer.csproj" />
   </Folder>
+  <Folder Name="/Fanout/">
+    <Project Path="Fanout/PubSub.Sample.Fanout.Publisher/PubSub.Sample.Fanout.Publisher.csproj" />
+    <Project Path="Fanout/PubSub.Sample.Fanout.Consumer/PubSub.Sample.Fanout.Consumer.csproj" />
+  </Folder>
   <Project Path="PubSub.Sample.Common/PubSub.Sample.Common.csproj" />
 </Solution>
