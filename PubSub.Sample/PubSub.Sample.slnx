@@ -1,1 +1,7 @@
-<Solution />
+<Solution>
+  <Folder Name="/Basic/">
+    <Project Path="Basic/PubSub.Sample.Basic.Producer/PubSub.Sample.Basic.Producer.csproj" />
+    <Project Path="Basic/PubSub.Sample.Basic.Consumer/PubSub.Sample.Basic.Consumer.csproj" />
+  </Folder>
+  <Project Path="PubSub.Sample.Common/PubSub.Sample.Common.csproj" />
+</Solution>
