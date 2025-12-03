@@ -1,4 +1,8 @@
-namespace PubSub.Sample.ErrorHandling.Publisher
+using PubSub.Sample.Common;
+using RabbitMQ.Client;
+using System.Text;
+
+namespace PubSub.Sample.ErrorHandling.Publisher;
 
 public class PublisherErrorHandlingExchange
 {
@@ -39,7 +43,7 @@ public class PublisherErrorHandlingExchange
             autoDelete: false,
             arguments: null);
 
-        var mainQueueArgs = new Dictionary<string, object>
+        var mainQueueArgs = new Dictionary<string, object?>
         {
             { "x-dead-letter-exchange", DlqExchange },
             { "x-dead-letter-routing-key", RoutingKey },
@@ -55,7 +59,7 @@ public class PublisherErrorHandlingExchange
         await channel.QueueBindAsync(
             queue: MainQueue,
             exchange: MainExchange,
-            routingKey: RoutingKey);    
+            routingKey: RoutingKey);
 
         Console.WriteLine("Error Handling Exchange Publisher is running...");
         Console.WriteLine("Type job messages; ones containing 'fail' will simulate failures in worker.\nEmpty line = exit.\n");
@@ -70,16 +74,13 @@ public class PublisherErrorHandlingExchange
                 Console.WriteLine("Exiting...");
                 break;
             }
-            
+
             var body = Encoding.UTF8.GetBytes(job);
-            var properties = channel.CreateBasicProperties();
-            properties.Persistent = true;
 
             await channel.BasicPublishAsync(
                 exchange: MainExchange,
                 routingKey: RoutingKey,
-                body: new ReadOnlyMemory<byte>(body),
-                properties: properties);
+                body: new ReadOnlyMemory<byte>(body));
 
             Console.WriteLine($" [x] Sent '{job}' to exchange '{MainExchange}'");
         }
