@@ -1,4 +1,4 @@
-using System.Text;
+﻿using System.Text;
 using PubSub.Sample.Common;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
@@ -85,11 +85,11 @@ public class ConsumerErrorHandlingExchange
 
                 if (message.Contains("fail", StringComparison.OrdinalIgnoreCase))
                 {
-                    Console.WriteLine($" [x] Error processing '{message}' - will be requeued");
+                    Console.WriteLine("Simulated failure. NACK → DLQ");
                     await channel.BasicNackAsync(
                         deliveryTag: e.DeliveryTag,
                         multiple: false,
-                        requeue: true);
+                        requeue: false);
                 }
                 else
                 {
