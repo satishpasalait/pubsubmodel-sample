@@ -19,5 +19,9 @@
     <Project Path="AckQoS/PubSub.Sample.AckQoS.Publisher/PubSub.Sample.AckQoS.Publisher.csproj" />
     <Project Path="AckQoS/PubSub.Sample.AckQoS.Consumer/PubSub.Sample.AckQoS.Consumer.csproj" />
   </Folder>
+  <Folder Name="/ErrorHandling/">
+    <Project Path="ErrorHandling/PubSub.Sample.ErrorHandling.Publisher/PubSub.Sample.ErrorHandling.Publisher.csproj" />
+    <Project Path="ErrorHandling/PubSub.Sample.ErrorHandling.Consumer/PubSub.Sample.ErrorHandling.Consumer.csproj" />
+  </Folder>
   <Project Path="PubSub.Sample.Common/PubSub.Sample.Common.csproj" />
 </Solution>
