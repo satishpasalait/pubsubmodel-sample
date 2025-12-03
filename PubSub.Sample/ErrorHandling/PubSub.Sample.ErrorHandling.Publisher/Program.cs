@@ -1,4 +1,4 @@
-// See https://aka.ms/new-console-template for more information
+using PubSub.Sample.ErrorHandling.Publisher;
 
-Console.WriteLine("Hello, World!");
-
+var publisher = new PublisherErrorHandlingExchange();
+await publisher.SendMessage();

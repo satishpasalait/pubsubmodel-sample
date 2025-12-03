@@ -1,4 +1,4 @@
-// See https://aka.ms/new-console-template for more information
+using PubSub.Sample.ErrorHandling.Consumer;
 
-Console.WriteLine("Hello, World!");
-
+var consumer = new ConsumerErrorHandlingExchange();
+await consumer.ReceiveMessage();
