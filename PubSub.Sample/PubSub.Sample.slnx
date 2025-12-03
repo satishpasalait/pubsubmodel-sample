@@ -15,5 +15,9 @@
     <Project Path="Durable/PubSub.Sample.Durable.Publisher/PubSub.Sample.Durable.Publisher.csproj" />
     <Project Path="Durable/PubSub.Sample.Durable.Consumer/PubSub.Sample.Durable.Consumer.csproj" />
   </Folder>
+  <Folder Name="/AckQoS/">
+    <Project Path="AckQoS/PubSub.Sample.AckQoS.Publisher/PubSub.Sample.AckQoS.Publisher.csproj" />
+    <Project Path="AckQoS/PubSub.Sample.AckQoS.Consumer/PubSub.Sample.AckQoS.Consumer.csproj" />
+  </Folder>
   <Project Path="PubSub.Sample.Common/PubSub.Sample.Common.csproj" />
 </Solution>
