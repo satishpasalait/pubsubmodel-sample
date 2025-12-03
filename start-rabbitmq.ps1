@@ -20,3 +20,4 @@ Write-Host ""
 Write-Host "To stop RabbitMQ: docker stop rabbitmq" -ForegroundColor Yellow
 Write-Host "To remove RabbitMQ: docker rm rabbitmq" -ForegroundColor Yellow
 
+
