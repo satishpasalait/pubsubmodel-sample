@@ -11,5 +11,9 @@
     <Project Path="Topic/PubSub.Sample.Topic.Publisher/PubSub.Sample.Topic.Publisher.csproj" />
     <Project Path="Topic/PubSub.Sample.Topic.Consumer/PubSub.Sample.Topic.Consumer.csproj" />
   </Folder>
+  <Folder Name="/Durable/">
+    <Project Path="Durable/PubSub.Sample.Durable.Publisher/PubSub.Sample.Durable.Publisher.csproj" />
+    <Project Path="Durable/PubSub.Sample.Durable.Consumer/PubSub.Sample.Durable.Consumer.csproj" />
+  </Folder>
   <Project Path="PubSub.Sample.Common/PubSub.Sample.Common.csproj" />
 </Solution>
