@@ -1,6 +1,6 @@
 # PubSub.Sample - RabbitMQ Messaging Patterns
 
-A comprehensive .NET 10 sample solution demonstrating different RabbitMQ messaging patterns, including Basic Queue, Fanout Exchange, and Topic Exchange patterns.
+A comprehensive .NET 10 sample solution demonstrating different RabbitMQ messaging patterns, from basic queues to advanced error handling and real-world event-driven architectures.
 
 ## Table of Contents
 
@@ -12,16 +12,25 @@ A comprehensive .NET 10 sample solution demonstrating different RabbitMQ messagi
   - [Basic Queue](#1-basic-queue)
   - [Fanout Exchange](#2-fanout-exchange)
   - [Topic Exchange](#3-topic-exchange)
+  - [Durable Messaging](#4-durable-messaging)
+  - [Acknowledgment and QoS](#5-acknowledgment-and-qos)
+  - [Error Handling](#6-error-handling)
+  - [Order Events System](#7-order-events-system)
 - [Running the Projects](#running-the-projects)
 - [Common Utilities](#common-utilities)
+- [Troubleshooting](#troubleshooting)
 
 ## Overview
 
-This solution demonstrates three fundamental RabbitMQ messaging patterns:
+This solution demonstrates fundamental and advanced RabbitMQ messaging patterns:
 
 1. **Basic Queue** - Simple point-to-point messaging between a single producer and consumer
 2. **Fanout Exchange** - Broadcasting messages to multiple consumers simultaneously
 3. **Topic Exchange** - Routing messages to consumers based on routing key patterns
+4. **Durable Messaging** - Ensuring messages and queues survive broker restarts
+5. **Acknowledgment and QoS** - Implementing message acknowledgment and controlling consumer message flow
+6. **Error Handling** - Demonstrating strategies for handling message processing failures
+7. **Order Events System** - A comprehensive real-world example using Topic Exchange with multiple microservices
 
 Each pattern includes a separate Producer/Publisher and Consumer project to demonstrate the pattern's behavior.
 
@@ -44,6 +53,22 @@ PubSub.Sample/
 ├── Topic/                                    # Topic Exchange Pattern
 │   ├── PubSub.Sample.Topic.Publisher        # Publisher application
 │   └── PubSub.Sample.Topic.Consumer         # Consumer application
+├── Durable/                                  # Durable Messaging Pattern
+│   ├── PubSub.Sample.Durable.Publisher      # Publisher application
+│   └── PubSub.Sample.Durable.Consumer       # Consumer application
+├── AckQoS/                                   # Acknowledgment and QoS Pattern
+│   ├── PubSub.Sample.AckQoS.Publisher       # Publisher application
+│   └── PubSub.Sample.AckQoS.Consumer        # Consumer application
+├── ErrorHandling/                            # Error Handling Pattern
+│   ├── PubSub.Sample.ErrorHandling.Publisher # Publisher application
+│   └── PubSub.Sample.ErrorHandling.Consumer # Consumer application
+├── OrderEventsSystem/                        # Real-world Event-Driven System
+│   ├── PubSub.Sample.OrderEventsSystem.Common           # Common utilities
+│   ├── PubSub.Sample.OrderEventsSystem.OrderEvents      # Event definitions
+│   ├── PubSub.Sample.OrderEventsSystem.Publisher        # Event publisher
+│   ├── PubSub.Sample.OrderEventsSystem.EmailService     # Email service consumer
+│   ├── PubSub.Sample.OrderEventsSystem.AnalyticsService # Analytics consumer
+│   └── PubSub.Sample.OrderEventsSystem.AuditService     # Audit log consumer
 └── PubSub.Sample.Common/                    # Shared utilities and helpers
     └── RabbitMqConnectionHelper.cs          # Common RabbitMQ connection helper
 ```
@@ -261,6 +286,268 @@ dotnet build
 
 ---
 
+### 4. Durable Messaging
+
+**Purpose**: Ensure messages and queues survive RabbitMQ broker restarts. Essential for production systems that require message persistence.
+
+**Key Characteristics**:
+- Durable exchanges and queues survive broker restarts
+- Messages are persisted to disk
+- Critical for production environments
+- Slightly slower performance due to disk I/O
+
+**Use Cases**:
+- Critical business messages that must not be lost
+- Production systems requiring message persistence
+- Financial transactions and audit logs
+- Important notifications and alerts
+
+**How It Works**:
+- Exchange declared with `durable: true`
+- Queue declared with `durable: true`
+- Messages are persisted to disk
+- After broker restart, durable queues and their messages are restored
+
+**Projects**:
+- `PubSub.Sample.Durable.Publisher` - Publishes messages to a durable exchange
+- `PubSub.Sample.Durable.Consumer` - Consumes messages from a durable queue
+
+**Exchange Configuration**:
+- Exchange Name: `durable.exchange`
+- Exchange Type: `Direct`
+- Durable: `true`
+- Auto-delete: `false`
+
+**Queue Configuration**:
+- Queue Name: `durable.queue`
+- Durable: `true`
+- Auto-delete: `false`
+- Exclusive: `false`
+
+**Running the Example**:
+1. Start the Consumer:
+   ```powershell
+   dotnet run --project PubSub.Sample/Durable/PubSub.Sample.Durable.Consumer
+   ```
+2. Start the Publisher (in another terminal):
+   ```powershell
+   dotnet run --project PubSub.Sample/Durable/PubSub.Sample.Durable.Publisher
+   ```
+3. Send some messages, then stop RabbitMQ and restart it
+4. Observe that messages are still available after restart (if consumer wasn't running when messages were sent)
+
+**Notes**:
+- Durable queues and exchanges survive broker restarts
+- Messages in durable queues are persisted to disk
+- Use durable messaging for critical messages that must not be lost
+- Non-durable queues/exchanges are faster but lose all data on restart
+- In production, always use durable queues for important messages
+
+---
+
+### 5. Acknowledgment and QoS
+
+**Purpose**: Control message delivery and ensure reliable processing by using manual acknowledgments and quality of service (QoS) settings.
+
+**Key Characteristics**:
+- Manual message acknowledgment (explicit ACK/NACK)
+- Quality of Service (QoS) controls message prefetch
+- Messages are only removed after acknowledgment
+- Failed messages can be requeued
+- Prevents message loss if consumer crashes
+
+**Use Cases**:
+- Critical message processing that must not be lost
+- Long-running tasks where processing may fail
+- Ensuring exactly-once processing
+- Controlling message flow to prevent consumer overload
+
+**How It Works**:
+- Consumer sets QoS to control how many unacknowledged messages it can receive
+- Messages are delivered to consumer but not removed from queue
+- Consumer processes message and sends ACK when successful
+- If processing fails, consumer sends NACK with requeue option
+- Message is only removed from queue after ACK
+
+**Projects**:
+- `PubSub.Sample.AckQoS.Publisher` - Publishes 30 messages to demonstrate QoS
+- `PubSub.Sample.AckQoS.Consumer` - Consumes messages with manual ACK and QoS
+
+**Queue Configuration**:
+- Queue Name: `ackqos.queue`
+- Durable: `true`
+- Auto-delete: `false`
+- QoS Prefetch Count: `1` (process one message at a time)
+
+**Running the Example**:
+1. Start the Publisher (sends 30 messages):
+   ```powershell
+   dotnet run --project PubSub.Sample/AckQoS/PubSub.Sample.AckQoS.Publisher
+   ```
+2. Start the Consumer:
+   ```powershell
+   dotnet run --project PubSub.Sample/AckQoS/PubSub.Sample.AckQoS.Consumer
+   ```
+3. Observe messages being processed one at a time (due to QoS=1)
+4. Messages containing "error" will be rejected and requeued
+5. Stop consumer mid-processing to see messages remain in queue
+
+**Notes**:
+- `autoAck: false` enables manual acknowledgment mode
+- QoS `prefetchCount: 1` limits consumer to one unacknowledged message
+- `BasicAckAsync` confirms successful processing
+- `BasicNackAsync` with `requeue: true` puts message back in queue for retry
+- Messages are only removed after acknowledgment
+- Use this pattern for critical messages that require reliable processing
+
+---
+
+### 6. Error Handling
+
+**Purpose**: Implement robust error handling strategies including dead letter queues (DLQ) for failed messages.
+
+**Key Characteristics**:
+- Dead Letter Exchange (DLX) for failed messages
+- Dead Letter Queue (DLQ) to store failed messages
+- Automatic routing of rejected/nacked messages to DLQ
+- Retry mechanisms and error recovery
+- Audit trail of failed messages
+
+**Use Cases**:
+- Handling transient failures with automatic retry
+- Storing permanently failed messages for analysis
+- Implementing retry policies
+- Monitoring and debugging message processing issues
+- Preventing poison messages from blocking processing
+
+**How It Works**:
+- Main queue configured with Dead Letter Exchange (DLX)
+- Failed messages (NACK without requeue) are routed to DLX
+- DLX routes messages to Dead Letter Queue (DLQ)
+- DLQ stores failed messages for analysis or manual reprocessing
+- Can implement retry logic with message TTL and delayed queues
+
+**Projects**:
+- `PubSub.Sample.ErrorHandling.Publisher` - Publishes messages to main exchange
+- `PubSub.Sample.ErrorHandling.Consumer` - Consumes messages with error handling and DLQ routing
+
+**Exchange Configuration**:
+- Main Exchange: `main.exchange` (Direct, non-durable)
+- DLQ Exchange: `dlq.exchange` (Direct, non-durable)
+
+**Queue Configuration**:
+- Main Queue: `main.queue` (with DLX configured)
+- DLQ Queue: `dlq.queue` (durable)
+
+**Running the Example**:
+1. Start the Consumer:
+   ```powershell
+   dotnet run --project PubSub.Sample/ErrorHandling/PubSub.Sample.ErrorHandling.Consumer
+   ```
+2. Start the Publisher (in another terminal):
+   ```powershell
+   dotnet run --project PubSub.Sample/ErrorHandling/PubSub.Sample.ErrorHandling.Publisher
+   ```
+3. Send messages - some will fail and be routed to DLQ
+4. Check the DLQ queue in RabbitMQ Management UI to see failed messages
+
+**Notes**:
+- Dead Letter Exchange is configured via queue arguments (`x-dead-letter-exchange`)
+- Failed messages are automatically routed to DLQ without requeue
+- DLQ allows analysis of why messages failed
+- Can implement retry logic by republishing from DLQ after delay
+- Use this pattern for production systems requiring robust error handling
+
+---
+
+### 7. Order Events System
+
+**Purpose**: A comprehensive real-world example demonstrating event-driven architecture using Topic Exchange with multiple microservices consuming order-related events.
+
+**Key Characteristics**:
+- Event-driven architecture with multiple consumers
+- Topic Exchange for flexible event routing
+- Multiple microservices (Email, Analytics, Audit)
+- JSON-serialized event objects
+- Durable exchanges and queues for production-like setup
+- Selective event subscription using routing key patterns
+
+**Use Cases**:
+- E-commerce order processing
+- Microservices communication
+- Event sourcing patterns
+- Multi-service notification systems
+- Analytics and audit logging
+
+**How It Works**:
+- Publisher creates different order events (Created, Shipped, Cancelled, Payment Received)
+- Events published to Topic Exchange with routing keys like `order.created.{orderId}`
+- Multiple services subscribe with different routing key patterns:
+  - Email Service: `order.*` (all order events)
+  - Analytics Service: `#` (all events)
+  - Audit Service: `#` (all events)
+- Each service processes events independently and asynchronously
+
+**Projects**:
+- `PubSub.Sample.OrderEventsSystem.OrderEvents` - Event type definitions (records)
+- `PubSub.Sample.OrderEventsSystem.Common` - Shared connection helper
+- `PubSub.Sample.OrderEventsSystem.Publisher` - Publishes order events
+- `PubSub.Sample.OrderEventsSystem.EmailService` - Sends emails for order events
+- `PubSub.Sample.OrderEventsSystem.AnalyticsService` - Tracks events for analytics
+- `PubSub.Sample.OrderEventsSystem.AuditService` - Logs all events for audit
+
+**Event Types**:
+- `OrderCreated(OrderId, CustomerEmail, Amount)`
+- `OrderShipped(OrderId, TrackingNumber, ShippingProvider)`
+- `OrderCancelled(OrderId, Reason)`
+- `PaymentReceived(OrderId, Amount, PaymentMethod)`
+
+**Exchange Configuration**:
+- Exchange Name: `order.events.exchange`
+- Exchange Type: `Topic`
+- Durable: `true`
+
+**Queue Configuration**:
+- Email Queue: `order.events.email.queue` (binding: `order.*`)
+- Analytics Queue: `order.events.analytics.queue` (binding: `#`)
+- Audit Queue: `order.events.audit.queue` (binding: `#`)
+
+**Running the Example**:
+1. Start all service consumers (in separate terminals):
+   ```powershell
+   # Email Service
+   dotnet run --project PubSub.Sample/OrderEventsSystem/PubSub.Sample.OrderEventsSystem.EmailService
+   
+   # Analytics Service
+   dotnet run --project PubSub.Sample/OrderEventsSystem/PubSub.Sample.OrderEventsSystem.AnalyticsService
+   
+   # Audit Service
+   dotnet run --project PubSub.Sample/OrderEventsSystem/PubSub.Sample.OrderEventsSystem.AuditService
+   ```
+2. Start the Publisher (in another terminal):
+   ```powershell
+   dotnet run --project PubSub.Sample/OrderEventsSystem/PubSub.Sample.OrderEventsSystem.Publisher
+   ```
+3. Choose event type (1-4) and enter event details
+4. Observe how different services react to the same events
+
+**Event Routing**:
+- Publisher sends events with routing keys: `order.created.{orderId}`, `order.shipped.{orderId}`, etc.
+- Email Service receives all order events (`order.*`)
+- Analytics Service receives all events (`#`)
+- Audit Service receives all events (`#`)
+
+**Notes**:
+- Demonstrates real-world event-driven architecture
+- Multiple services can process the same events independently
+- Services can subscribe to specific event types using routing key patterns
+- Events are JSON-serialized for interoperability
+- Durable queues ensure events are not lost
+- Each service can scale independently
+- Use this pattern for microservices architectures and event-driven systems
+
+---
+
 ## Running the Projects
 
 ### Build All Projects
@@ -298,6 +585,44 @@ dotnet run --project PubSub.Sample/Topic/PubSub.Sample.Topic.Consumer -- "order.
 dotnet run --project PubSub.Sample/Topic/PubSub.Sample.Topic.Publisher
 ```
 
+**Durable Messaging:**
+```powershell
+# Consumer
+dotnet run --project PubSub.Sample/Durable/PubSub.Sample.Durable.Consumer
+
+# Publisher (in another terminal)
+dotnet run --project PubSub.Sample/Durable/PubSub.Sample.Durable.Publisher
+```
+
+**Acknowledgment and QoS:**
+```powershell
+# Publisher (sends 30 messages)
+dotnet run --project PubSub.Sample/AckQoS/PubSub.Sample.AckQoS.Publisher
+
+# Consumer (in another terminal)
+dotnet run --project PubSub.Sample/AckQoS/PubSub.Sample.AckQoS.Consumer
+```
+
+**Error Handling:**
+```powershell
+# Consumer
+dotnet run --project PubSub.Sample/ErrorHandling/PubSub.Sample.ErrorHandling.Consumer
+
+# Publisher (in another terminal)
+dotnet run --project PubSub.Sample/ErrorHandling/PubSub.Sample.ErrorHandling.Publisher
+```
+
+**Order Events System:**
+```powershell
+# Start all services (in separate terminals)
+dotnet run --project PubSub.Sample/OrderEventsSystem/PubSub.Sample.OrderEventsSystem.EmailService
+dotnet run --project PubSub.Sample/OrderEventsSystem/PubSub.Sample.OrderEventsSystem.AnalyticsService
+dotnet run --project PubSub.Sample/OrderEventsSystem/PubSub.Sample.OrderEventsSystem.AuditService
+
+# Publisher (in another terminal)
+dotnet run --project PubSub.Sample/OrderEventsSystem/PubSub.Sample.OrderEventsSystem.Publisher
+```
+
 **Note**: The Topic Consumer requires a routing key pattern as a command-line argument. Examples:
 - `"order.*"` - All order events
 - `"*.created"` - All created events  
@@ -331,6 +656,8 @@ using PubSub.Sample.Common;
 var connection = RabbitMqConnectionHelper.CreateConnection();
 ```
 
+**Note**: The `OrderEventsSystem` folder has its own `PubSub.Sample.OrderEventsSystem.Common` project that contains a separate `RabbitMqConnectionHelper` specifically for that system. This allows for independent configuration if needed in a multi-system architecture.
+
 ## Troubleshooting
 
 ### Connection Issues
@@ -356,11 +683,21 @@ var connection = RabbitMqConnectionHelper.CreateConnection();
 
 ## Notes
 
-- All exchanges and queues are non-durable (will be deleted on RabbitMQ restart)
-- Auto-acknowledgment is enabled for simplicity (messages are automatically removed after delivery)
+### Pattern Characteristics
+
+- **Basic, Fanout, Topic**: Non-durable exchanges/queues (deleted on RabbitMQ restart) with auto-acknowledgment
+- **Durable**: Durable exchanges and queues (survive broker restarts) - production-ready configuration
+- **AckQoS**: Manual acknowledgment with Quality of Service (QoS) control
+- **ErrorHandling**: Dead Letter Queue (DLQ) pattern for failed messages
+- **OrderEventsSystem**: Durable Topic Exchange with multiple microservices - real-world architecture
+
+### General Notes
+
 - Connection errors include helpful diagnostic messages
 - Each project can be run independently
 - Multiple instances of consumers can be run simultaneously to demonstrate message distribution
+- Durable patterns are recommended for production environments
+- Manual acknowledgment patterns ensure message reliability but require explicit ACK/NACK handling
 
 ## License
 
