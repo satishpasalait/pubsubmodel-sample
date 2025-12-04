@@ -23,5 +23,13 @@
     <Project Path="ErrorHandling/PubSub.Sample.ErrorHandling.Publisher/PubSub.Sample.ErrorHandling.Publisher.csproj" />
     <Project Path="ErrorHandling/PubSub.Sample.ErrorHandling.Consumer/PubSub.Sample.ErrorHandling.Consumer.csproj" />
   </Folder>
+  <Folder Name="/OrderEventsSystem/">
+    <Project Path="OrderEventsSystem/PubSub.Sample.OrderEventsSystem.Common/PubSub.Sample.OrderEventsSystem.Common.csproj" />
+    <Project Path="OrderEventsSystem/PubSub.Sample.OrderEventsSystem.OrderEvents/PubSub.Sample.OrderEventsSystem.OrderEvents.csproj" />
+    <Project Path="OrderEventsSystem/PubSub.Sample.OrderEventsSystem.Publisher/PubSub.Sample.OrderEventsSystem.Publisher.csproj" />
+    <Project Path="OrderEventsSystem/PubSub.Sample.OrderEventsSystem.EmailService/PubSub.Sample.OrderEventsSystem.EmailService.csproj" />
+    <Project Path="OrderEventsSystem/PubSub.Sample.OrderEventsSystem.AnalyticsService/PubSub.Sample.OrderEventsSystem.AnalyticsService.csproj" />
+    <Project Path="OrderEventsSystem/PubSub.Sample.OrderEventsSystem.AuditService/PubSub.Sample.OrderEventsSystem.AuditService.csproj" />
+  </Folder>
   <Project Path="PubSub.Sample.Common/PubSub.Sample.Common.csproj" />
 </Solution>

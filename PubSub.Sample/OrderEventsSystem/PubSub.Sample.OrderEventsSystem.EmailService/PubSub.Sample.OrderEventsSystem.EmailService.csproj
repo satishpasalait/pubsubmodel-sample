@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AssemblyName>PubSub.Sample.OrderEventsSystem.EmailService</AssemblyName>
+    <RootNamespace>PubSub.Sample.OrderEventsSystem.EmailService</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="RabbitMQ.Client" Version="7.2.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\PubSub.Sample.OrderEventsSystem.Common\PubSub.Sample.OrderEventsSystem.Common.csproj" />
+    <ProjectReference Include="..\PubSub.Sample.OrderEventsSystem.OrderEvents\PubSub.Sample.OrderEventsSystem.OrderEvents.csproj" />
+  </ItemGroup>
+</Project>
+

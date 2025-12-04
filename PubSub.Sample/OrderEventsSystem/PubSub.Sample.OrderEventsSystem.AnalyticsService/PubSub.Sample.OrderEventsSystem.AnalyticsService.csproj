@@ -4,16 +4,15 @@
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <AssemblyName>PubSub.Sample.Topic.Publisher</AssemblyName>
-    <RootNamespace>PubSub.Sample.Topic.Publisher</RootNamespace>
+    <AssemblyName>PubSub.Sample.OrderEventsSystem.AnalyticsService</AssemblyName>
+    <RootNamespace>PubSub.Sample.OrderEventsSystem.AnalyticsService</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="RabbitMQ.Client" Version="7.2.0" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\PubSub.Sample.Common\PubSub.Sample.Common.csproj" />
+    <ProjectReference Include="..\PubSub.Sample.OrderEventsSystem.Common\PubSub.Sample.OrderEventsSystem.Common.csproj" />
   </ItemGroup>
 </Project>
-
 
 
